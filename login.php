@@ -21,7 +21,7 @@
 
         if(mysqli_num_rows($result) == 0){
             echo "<script>
-                     alert('Username tidak ditemukan pastikan ada memasukan username dengan benar');
+                     alert('Username tidak ditemukan. Pastikan Anda memasukkan username dengan benar');
                   </script>";
         } else {
             $row = mysqli_fetch_assoc($result);
@@ -32,7 +32,7 @@
                 exit();
             } else {
                 echo "<script>
-                     alert('Password salah');
+                     alert('Password Salah');
                   </script>";
             }
         }

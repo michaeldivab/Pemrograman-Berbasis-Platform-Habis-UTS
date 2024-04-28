@@ -17,7 +17,7 @@ if (isset($_POST['tambah'])){
         exit();
     } else {
         echo "<script> 
-              alert('data harus diisi');
+              alert('Data Harus Diisi');
               </script>";
     }
 }

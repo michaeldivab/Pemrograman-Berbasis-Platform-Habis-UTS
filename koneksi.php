@@ -8,7 +8,7 @@
 
         if($username != null && ($password1 != null || $password2 != null)){
             if($password1 != $password2){
-                echo'<script> alert("password beda");</script>';
+                echo'<script> alert("Password Berbeda");</script>';
             } else {
                 $existing_user = query("SELECT * FROM user WHERE username='$username'");
                 if(!$existing_user){
@@ -18,7 +18,7 @@
                     header("Location: login.php");
                     exit();
                 } else {
-                    echo'<script> alert("username udah dipakai harap ganti");</script>';
+                    echo'<script> alert("Nama pengguna sudah digunakan, mohon pilih yang lain");</script>';
                 }
             }
         } else {
@@ -75,7 +75,7 @@
                 }
             }
         } else {
-            echo "<script>alert('Terjadi kesalahan dalam mengambil status data');</script>";
+            echo "<script>alert('Ada kesalahan saat mengambil status data');</script>";
         }
     }    
     
