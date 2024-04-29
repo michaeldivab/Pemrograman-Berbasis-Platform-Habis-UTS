@@ -7,17 +7,15 @@
         header("Location: register.php");
         exit();
     } elseif(isset($_POST['loginbtn'])){
-        login($_POST);
+        prosesLogin($_POST);
     }
     
-
-    function login($data){
-        global $conn;
-        $x = '';
+    function prosesLogin($data) {
+        global $koneksi;
         $username = $data['username'];
         $password = $data['password'];
 
-        $result = mysqli_query($conn,"SELECT * FROM user WHERE Username = '$username'");
+        $result = mysqli_query($koneksi, "SELECT * FROM user WHERE Username = '$username'");
 
         if(mysqli_num_rows($result) == 0){
             echo "<script>
@@ -26,7 +24,7 @@
         } else {
             $row = mysqli_fetch_assoc($result);
 
-            if (password_verify($password,$row["password"])) {
+            if (password_verify($password, $row["password"])) {
                 $_SESSION["login"] = true;
                 header("Location: todoList.php");
                 exit();
@@ -102,14 +100,6 @@
             margin-bottom: 10px;
         }
 
-        .header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            border-radius: 5px 5px 0 0;
-        }
-
         .profile {
             text-align: center;
             margin-bottom: 20px;
@@ -165,22 +155,21 @@
         }
 
         .login-btn {
-    width: 100%;
-    background-color: #4CAF50; /* Warna latar belakang */
-    color: #fff; /* Warna teks */
-    border: none;
-    cursor: pointer;
-    padding: 12px 20px; /* Padding tombol */
-    border-radius: 5px; /* Sudut melengkung */
-    font-size: 16px; /* Ukuran teks */
-    font-weight: bold; /* Ketebalan teks */
-    transition: background-color 0.3s ease; /* Animasi perubahan warna saat hover */
-}
+            width: 100%;
+            background-color: #4CAF50; /* Warna latar belakang */
+            color: #fff; /* Warna teks */
+            border: none;
+            cursor: pointer;
+            padding: 12px 20px; /* Padding tombol */
+            border-radius: 5px; /* Sudut melengkung */
+            font-size: 16px; /* Ukuran teks */
+            font-weight: bold; /* Ketebalan teks */
+            transition: background-color 0.3s ease; /* Animasi perubahan warna saat hover */
+        }
 
-.login-btn:hover {
-    background-color: #45a049; /* Warna latar belakang saat hover */
-}
-
+        .login-btn:hover {
+            background-color: #45a049; /* Warna latar belakang saat hover */
+        }
     </style>
 </head>
 <body>
@@ -193,17 +182,17 @@
         <div class="container">
             <h2>Login</h2>
             <div class="grup">
-                <label for="username"> Username </label>
+                <label for="username">Username</label>
                 <input type="text" id="username" name="username" placeholder="Username">
             </div>
             <div class="grup">
-                <label for="password"> password </label>
+                <label for="password">Password</label>
                 <input type="password" id="password" name="password" placeholder="Password">
             </div>
             <button type="submit" class="login-btn" name="loginbtn">Login</button>
             <div class="register-link">
                 <span>Belum punya akun? </span><a href="register.php">Register</a>
-        </div>
+            </div>
         </div>
     </form>
 </body>

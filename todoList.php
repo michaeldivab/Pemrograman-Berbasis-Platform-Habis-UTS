@@ -8,11 +8,11 @@ require 'koneksi.php';
 $error ='';
 
 // Inisialisasi array status selesai
-$selesaiArray = [];
+$completedTasks = [];
 
 if (isset($_POST['tambah'])){
     if (!empty($_POST['todo'])){
-        tambahTodo($_POST);
+        tambahTugas($_POST);
         header("Location: todoList.php");
         exit();
     } else {
@@ -25,7 +25,7 @@ if (isset($_POST['tambah'])){
 foreach ($_POST as $key => $value) {
     if (strpos($key, 'hapus') !== false) {
         $index = substr($key, strlen('hapus')); 
-        hapus($_POST, $index);
+        hapusTugas($_POST, $index);
     }
 }
 
@@ -33,12 +33,12 @@ foreach ($_POST as $key => $value) {
     if (strpos($key, 'selesai') !== false) {
         $index = substr($key, strlen('selesai')); 
         // Simpan informasi tentang todo mana yang selesai dicoret
-        $selesaiArray[$index] = true; // Simpan indeks todo yang selesai
-        selesai($_POST, $index);
+        $completedTasks[$index] = true; // Simpan indeks tugas yang selesai
+        tandaiSelesai($_POST, $index);
     }
 }
 
-$text = query("SELECT todo, status FROM todo");
+$tasks = jalankanQuery("SELECT todo, status FROM todo");
 ?>
 
 <!DOCTYPE html>
@@ -140,10 +140,10 @@ $text = query("SELECT todo, status FROM todo");
                 <input type="text" name="todo" placeholder="Teks todo">
                 <button class="tambah" name="tambah">Tambah</button>
             </div>
-            <?php foreach ($text as $index => $todo):?>
+            <?php foreach ($tasks as $index => $task):?>
 <div class="show-todo">
     <!-- Tambahkan kelas 'coret' jika statusnya 'selesai' -->
-    <input type="text" name="isi<?php echo $index;?>" value="<?php echo $todo['todo']; ?>" class="<?php echo $todo['status'] === 'selesai' ? 'coret' : '';?>" >
+    <input type="text" name="isi<?php echo $index;?>" value="<?php echo $task['todo']; ?>" class="<?php echo $task['status'] === 'selesai' ? 'coret' : '';?>" >
     <!-- Tambahkan fungsi onClick untuk tombol "Selesai" -->
     <button class="tambah" name="selesai<?php echo $index;?>" onClick="toggleCoret(this)">Selesai</button>
     <button class="tambah" name="hapus<?php echo $index;?>">Hapus</button>
