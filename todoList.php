@@ -133,6 +133,11 @@ $tasks = jalankanQuery("SELECT todo, status FROM todo");
         <h1>Michael Diva Berliano</h1>
         <img src="logotugas.png" alt="Foto Profil">
         <h2>225314020</h2>
+
+                <!-- Tombol logout -->
+                <form action="logout.php" method="post">
+            <button type="submit" name="logout" value="1">Logout</button>
+        </form>
     </header>
     <form action="" method="post">
         <div class="container">

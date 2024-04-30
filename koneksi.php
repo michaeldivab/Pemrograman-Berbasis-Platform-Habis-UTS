@@ -39,11 +39,11 @@ function jalankanQuery($query) {
     global $koneksi;
     $result = mysqli_query($koneksi, $query);
     if ($result) {
-        $datas = [];
+        $datasRecords = [];
         while ($row = mysqli_fetch_assoc($result)) {
-            $datas[] = $row;
+            $datasRecords[] = $row;
         }
-        return $datas;
+        return $datasRecords;
     } else {
         return null;
     }
