@@ -1,21 +1,16 @@
 <?php
 require 'koneksi.php';
-
 session_start();
 
-if (!isset($_SESSION["regis"])) {
-    header("Location: login.php");
-    exit();
-}
-
 if (isset($_POST['submitbtn'])) {
-    $result = tambahAkun($_POST); // Call the tambahAkun function
+    $result = tambahAkun($_POST); // Panggil fungsi tambahAkun
     if ($result === "success") {
-        header("Location: login.php"); // Redirect to login page after successful registration
+        header("Location: login.php"); // Redirect ke halaman login setelah registrasi sukses
         exit();
+    } else {
+        // Tampilkan pesan kesalahan jika ada
+        echo "<script>alert('$result');</script>";
     }
-    // Handle the result (error message) accordingly
-    echo "<script>alert('$result');</script>";
 }
 ?>
 

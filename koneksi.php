@@ -7,7 +7,7 @@ function tambahAkun($data) {
     $password1 = mysqli_real_escape_string($koneksi, $data['password1']);
     $password2 = mysqli_real_escape_string($koneksi, $data['password2']);
 
-    if ($username != null && ($password1 != null || $password2 != null)) {
+    if (!empty($username) && (!empty($password1) || !empty($password2))) {
         if ($password1 != $password2) {
             return "Password Berbeda";
         } else {
