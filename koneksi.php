@@ -31,19 +31,40 @@ function tambahTodo($data) {
     $text = $data['todo'];
     $user_id = $_SESSION["user_id"];
 
-    $query = "INSERT INTO todo (todo, status, user_id) VALUES ('$text', 'onprocess', '$user_id')";
+    $query = "INSERT INTO todo (todolist, status, user_id) VALUES ('$text', 'onprocess',$user_id)";
     mysqli_query($koneksi, $query);
 }
 
-function jalankanQuery($query) {
+function jalankanQuery() {
     global $koneksi;
-    $result = mysqli_query($koneksi, $query);
+    $result = mysqli_query($koneksi, "SELECT id FROM user");
+    
     if ($result) {
-        $datasRecords = [];
+        $userIds = [];
+        
         while ($row = mysqli_fetch_assoc($result)) {
-            $datasRecords[] = $row;
+            $userIds[] = $row['id'];
         }
-        return $datasRecords;
+        
+        // Buat string untuk kondisi WHERE dalam query SQL
+        $userIdsString = implode(',', $userIds); // Menggabungkan id pengguna menjadi string
+        
+        // Gunakan string id pengguna dalam query untuk mendapatkan tugas yang sesuai
+        $query = "SELECT * FROM todo WHERE user_id IN ($userIdsString)";
+        
+        $resultTodo = mysqli_query($koneksi, $query);
+        
+        if ($resultTodo) {
+            $datasRecords = [];
+            
+            while ($rowTodo = mysqli_fetch_assoc($resultTodo)) {
+                $datasRecords[] = $rowTodo;
+            }
+            
+            return $datasRecords;
+        } else {
+            return null;
+        }
     } else {
         return null;
     }
@@ -59,18 +80,18 @@ foreach ($_POST as $key => $value) {
 function hapusData($data, $index) {
     global $koneksi;
     $isi = $data['isi' . $index];
-    $query = "SELECT status FROM todo WHERE todo = '$isi'";
+    $query = "SELECT status FROM todo WHERE todolist = '$isi'";
     $result = mysqli_query($koneksi, $query);
     if ($result) {
         $row = mysqli_fetch_assoc($result);
         if ($row && isset($row['status']) && $row['status'] == 'selesai') {
-            $deleteQuery = "DELETE FROM todo WHERE todo = '$isi'";
+            $deleteQuery = "DELETE FROM todo WHERE todolist = '$isi'";
             mysqli_query($koneksi, $deleteQuery);
             return "Data berhasil dihapus";
         } else {
             $confirm = true;
             if ($confirm) {
-                $deleteQuery = "DELETE FROM todo WHERE todo = '$isi'";
+                $deleteQuery = "DELETE FROM todo WHERE todolist = '$isi'";
                 mysqli_query($koneksi, $deleteQuery);
                 return "Data berhasil dihapus";
             }
@@ -83,7 +104,7 @@ function hapusData($data, $index) {
 function tandaiSelesai($data, $index) {
     global $koneksi;
     $isi = $data['isi' . $index];
-    $query = "UPDATE todo SET status = 'selesai' WHERE todo = '$isi'";
+    $query = "UPDATE todo SET status = 'selesai' WHERE todolist = '$isi'";
     mysqli_query($koneksi, $query);
     return "Tugas telah ditandai sebagai selesai";
 }

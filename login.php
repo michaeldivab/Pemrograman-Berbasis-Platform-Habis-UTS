@@ -14,18 +14,19 @@
         global $koneksi;
         $username = $data['username'];
         $password = $data['password'];
-
+    
         $result = mysqli_query($koneksi, "SELECT * FROM user WHERE Username = '$username'");
-
+    
         if(mysqli_num_rows($result) == 0){
             echo "<script>
                      alert('Username tidak ditemukan. Pastikan Anda memasukkan username dengan benar');
                   </script>";
         } else {
-            $row = mysqli_fetch_assoc($result);
-
+            $row = mysqli_fetch_assoc($result); // Fetch the row from the query result
+    
             if (password_verify($password, $row["password"])) {
                 $_SESSION["login"] = true;
+                $_SESSION["user_id"] = $row["id"]; // Access 'id' column from the fetched row
                 header("Location: todoList.php");
                 exit();
             } else {
@@ -34,7 +35,7 @@
                   </script>";
             }
         }
-    }
+    }    
 ?>
 
 <!DOCTYPE html>

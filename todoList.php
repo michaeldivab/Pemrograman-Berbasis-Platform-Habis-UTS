@@ -38,7 +38,7 @@ foreach ($_POST as $key => $value) {
     }
 }
 
-$tasks = jalankanQuery("SELECT todo, status FROM todo");
+$tasks = jalankanQuery();
 ?>
 
 <!DOCTYPE html>
@@ -148,7 +148,7 @@ $tasks = jalankanQuery("SELECT todo, status FROM todo");
             <?php foreach ($tasks as $index => $task):?>
                 <div class="show-todo">
                     <!-- Tambahkan kelas 'coret' jika statusnya 'selesai' -->
-                    <input type="text" name="isi<?php echo $index;?>" value="<?php echo $task['todo']; ?>" class="<?php echo $task['status'] === 'selesai' ? 'coret' : '';?>" >
+                    <input type="text" name="isi<?php echo $index;?>" value="<?php echo $task['todolist']; ?>" class="<?php echo $task['status'] === 'selesai' ? 'coret' : '';?>" >
                     <!-- Tambahkan fungsi onClick untuk tombol "Selesai" -->
                     <button class="tambah" name="selesai<?php echo $index;?>" onClick="toggleCoret(this)">Selesai</button>
                     <button class="tambah" name="hapus<?php echo $index;?>">Hapus</button>
