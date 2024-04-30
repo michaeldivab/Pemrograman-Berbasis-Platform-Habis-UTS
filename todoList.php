@@ -12,7 +12,7 @@ $completedTasks = [];
 
 if (isset($_POST['tambah'])){
     if (!empty($_POST['todo'])){
-        tambahTugas($_POST);
+        tambahTodo($_POST);
         header("Location: todoList.php");
         exit();
     } else {
@@ -25,7 +25,7 @@ if (isset($_POST['tambah'])){
 foreach ($_POST as $key => $value) {
     if (strpos($key, 'hapus') !== false) {
         $index = substr($key, strlen('hapus')); 
-        hapusTugas($_POST, $index);
+        hapusData($_POST, $index); // Memanggil fungsi hapusData() untuk menghapus tugas
     }
 }
 
@@ -134,8 +134,8 @@ $tasks = jalankanQuery("SELECT todo, status FROM todo");
         <img src="logotugas.png" alt="Foto Profil">
         <h2>225314020</h2>
 
-                <!-- Tombol logout -->
-                <form action="logout.php" method="post">
+        <!-- Tombol logout -->
+        <form action="logout.php" method="post">
             <button type="submit" name="logout" value="1">Logout</button>
         </form>
     </header>
@@ -146,15 +146,15 @@ $tasks = jalankanQuery("SELECT todo, status FROM todo");
                 <button class="tambah" name="tambah">Tambah</button>
             </div>
             <?php foreach ($tasks as $index => $task):?>
-<div class="show-todo">
-    <!-- Tambahkan kelas 'coret' jika statusnya 'selesai' -->
-    <input type="text" name="isi<?php echo $index;?>" value="<?php echo $task['todo']; ?>" class="<?php echo $task['status'] === 'selesai' ? 'coret' : '';?>" >
-    <!-- Tambahkan fungsi onClick untuk tombol "Selesai" -->
-    <button class="tambah" name="selesai<?php echo $index;?>" onClick="toggleCoret(this)">Selesai</button>
-    <button class="tambah" name="hapus<?php echo $index;?>">Hapus</button>
-    <input type="hidden" name="index" value="<?php echo $index; ?>">
-</div>
-<?php endforeach;?>
+                <div class="show-todo">
+                    <!-- Tambahkan kelas 'coret' jika statusnya 'selesai' -->
+                    <input type="text" name="isi<?php echo $index;?>" value="<?php echo $task['todo']; ?>" class="<?php echo $task['status'] === 'selesai' ? 'coret' : '';?>" >
+                    <!-- Tambahkan fungsi onClick untuk tombol "Selesai" -->
+                    <button class="tambah" name="selesai<?php echo $index;?>" onClick="toggleCoret(this)">Selesai</button>
+                    <button class="tambah" name="hapus<?php echo $index;?>">Hapus</button>
+                    <input type="hidden" name="index" value="<?php echo $index; ?>">
+                </div>
+            <?php endforeach;?>
 
         </div>
     </form>
