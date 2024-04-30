@@ -1,24 +1,33 @@
 <?php
+// Mulai sesi jika belum dimulai
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Koneksi ke database
 $koneksi = mysqli_connect('localhost', 'root', '', 'platform');
 
+// Fungsi untuk menambahkan akun baru
 function tambahAkun($data) {
     global $koneksi;
     $username = $data['nama'];
     $password1 = mysqli_real_escape_string($koneksi, $data['password1']);
     $password2 = mysqli_real_escape_string($koneksi, $data['password2']);
 
-    if (!empty($username) && (!empty($password1) || !empty($password2))) {
+    // Validasi input
+    if (!empty($username) && !empty($password1) && !empty($password2)) {
         if ($password1 != $password2) {
-            return "Password Berbeda";
+            return "Password tidak sama";
         } else {
+            // Periksa apakah username sudah digunakan
             $existing_user = jalankanQuery("SELECT * FROM user WHERE username='$username'");
             if (!$existing_user) {
-                $password1 = password_hash($password1, PASSWORD_DEFAULT);
-                $query = "INSERT INTO user (username, password) VALUES ('$username', '$password1')";
+                $hashed_password = password_hash($password1, PASSWORD_DEFAULT);
+                $query = "INSERT INTO user (username, password) VALUES ('$username', '$hashed_password')";
                 mysqli_query($koneksi, $query);
                 return "success";
             } else {
-                return "Nama pengguna sudah digunakan, mohon pilih yang lain";
+                return "Nama pengguna sudah digunakan, silakan pilih yang lain";
             }
         }
     } else {
@@ -26,84 +35,47 @@ function tambahAkun($data) {
     }
 }
 
+// Fungsi untuk menambahkan todo baru
 function tambahTodo($data) {
     global $koneksi;
-    $text = $data['todo'];
-    $user_id = $_SESSION["user_id"];
-
-    $query = "INSERT INTO todo (todolist, status, user_id) VALUES ('$text', 'onprocess',$user_id)";
-    mysqli_query($koneksi, $query);
+    if (isset($_SESSION["user_id"])) {
+        $text = mysqli_real_escape_string($koneksi, $data['todo']);
+        $user_id = $_SESSION["user_id"];
+        $query = "INSERT INTO todo (todolist, status, user_id) VALUES ('$text', 'onprocess', $user_id)";
+        mysqli_query($koneksi, $query);
+    } else {
+        return "User ID tidak tersedia";
+    }
 }
 
-function jalankanQuery() {
+// Fungsi untuk menjalankan query dan mengembalikan hasil
+function jalankanQuery($query) {
     global $koneksi;
-    $result = mysqli_query($koneksi, "SELECT id FROM user");
-    
+    $result = mysqli_query($koneksi, $query);
     if ($result) {
-        $userIds = [];
-        
+        $datasRecords = [];
         while ($row = mysqli_fetch_assoc($result)) {
-            $userIds[] = $row['id'];
+            $datasRecords[] = $row;
         }
-        
-        // Buat string untuk kondisi WHERE dalam query SQL
-        $userIdsString = implode(',', $userIds); // Menggabungkan id pengguna menjadi string
-        
-        // Gunakan string id pengguna dalam query untuk mendapatkan tugas yang sesuai
-        $query = "SELECT * FROM todo WHERE user_id IN ($userIdsString)";
-        
-        $resultTodo = mysqli_query($koneksi, $query);
-        
-        if ($resultTodo) {
-            $datasRecords = [];
-            
-            while ($rowTodo = mysqli_fetch_assoc($resultTodo)) {
-                $datasRecords[] = $rowTodo;
-            }
-            
-            return $datasRecords;
-        } else {
-            return null;
-        }
+        return $datasRecords;
     } else {
         return null;
     }
 }
 
-foreach ($_POST as $key => $value) {
-    if (strpos($key, 'hapus') !== false) {
-        $index = substr($key, strlen('hapus'));
-        hapusData($_POST, $index);
-    }
-}
-
+// Fungsi untuk menghapus data todo
 function hapusData($data, $index) {
     global $koneksi;
-    $isi = $data['isi' . $index];
-    $query = "SELECT status FROM todo WHERE todolist = '$isi'";
-    $result = mysqli_query($koneksi, $query);
-    if ($result) {
-        $row = mysqli_fetch_assoc($result);
-        if ($row && isset($row['status']) && $row['status'] == 'selesai') {
-            $deleteQuery = "DELETE FROM todo WHERE todolist = '$isi'";
-            mysqli_query($koneksi, $deleteQuery);
-            return "Data berhasil dihapus";
-        } else {
-            $confirm = true;
-            if ($confirm) {
-                $deleteQuery = "DELETE FROM todo WHERE todolist = '$isi'";
-                mysqli_query($koneksi, $deleteQuery);
-                return "Data berhasil dihapus";
-            }
-        }
-    } else {
-        return "Ada kesalahan saat mengambil status data";
-    }
+    $isi = mysqli_real_escape_string($koneksi, $data['isi' . $index]);
+    $query = "DELETE FROM todo WHERE todolist = '$isi'";
+    mysqli_query($koneksi, $query);
+    return "Data berhasil dihapus";
 }
 
+// Fungsi untuk menandai tugas sebagai selesai
 function tandaiSelesai($data, $index) {
     global $koneksi;
-    $isi = $data['isi' . $index];
+    $isi = mysqli_real_escape_string($koneksi, $data['isi' . $index]);
     $query = "UPDATE todo SET status = 'selesai' WHERE todolist = '$isi'";
     mysqli_query($koneksi, $query);
     return "Tugas telah ditandai sebagai selesai";

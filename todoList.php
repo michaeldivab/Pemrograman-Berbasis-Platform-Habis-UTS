@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start();
 if (!isset($_SESSION["login"])) {
     header("Location: login.php");
@@ -9,6 +9,10 @@ $error ='';
 
 // Inisialisasi array status selesai
 $completedTasks = [];
+
+// Memanggil jalankanQuery() dengan query SQL yang sesuai
+$user_id = $_SESSION["user_id"];
+$tasks = jalankanQuery("SELECT * FROM todo WHERE user_id = $user_id");
 
 if (isset($_POST['tambah'])){
     if (!empty($_POST['todo'])){
@@ -37,8 +41,6 @@ foreach ($_POST as $key => $value) {
         tandaiSelesai($_POST, $index);
     }
 }
-
-$tasks = jalankanQuery();
 ?>
 
 <!DOCTYPE html>

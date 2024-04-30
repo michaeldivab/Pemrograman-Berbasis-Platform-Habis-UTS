@@ -1,6 +1,5 @@
 <?php
-require 'koneksi.php';
-session_start();
+require 'koneksi.php'; // Sesi sudah aktif dilakukan di koneksi.php
 
 if (isset($_POST['submitbtn'])) {
     $result = tambahAkun($_POST); // Panggil fungsi tambahAkun
