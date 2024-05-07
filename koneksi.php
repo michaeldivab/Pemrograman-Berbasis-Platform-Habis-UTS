@@ -66,18 +66,44 @@ function jalankanQuery($query) {
 // Fungsi untuk menghapus data todo
 function hapusData($data, $index) {
     global $koneksi;
+
+    // Pastikan $index sesuai dengan indeks yang ingin dihapus
     $isi = mysqli_real_escape_string($koneksi, $data['isi' . $index]);
-    $query = "DELETE FROM todo WHERE todolist = '$isi'";
-    mysqli_query($koneksi, $query);
-    return "Data berhasil dihapus";
+
+    // Periksa query DELETE untuk menghapus data dengan isi yang sesuai
+    $query = "DELETE FROM todo WHERE todolist = ?";
+    $stmt = mysqli_prepare($koneksi, $query);
+    mysqli_stmt_bind_param($stmt, "s", $isi);
+
+    if (mysqli_stmt_execute($stmt)) {
+        mysqli_stmt_close($stmt);
+        return "Data berhasil dihapus";
+    } else {
+        mysqli_stmt_close($stmt);
+        return "Error: " . mysqli_error($koneksi);
+    }
 }
+
 
 // Fungsi untuk menandai tugas sebagai selesai
 function tandaiSelesai($data, $index) {
     global $koneksi;
+
+    // Pastikan $index sesuai dengan indeks yang ingin ditandai selesai
     $isi = mysqli_real_escape_string($koneksi, $data['isi' . $index]);
-    $query = "UPDATE todo SET status = 'selesai' WHERE todolist = '$isi'";
-    mysqli_query($koneksi, $query);
-    return "Tugas telah ditandai sebagai selesai";
+
+    // Periksa query UPDATE untuk menandai tugas sebagai selesai
+    $query = "UPDATE todo SET status = 'selesai' WHERE todolist = ?";
+    $stmt = mysqli_prepare($koneksi, $query);
+    mysqli_stmt_bind_param($stmt, "s", $isi);
+
+    if (mysqli_stmt_execute($stmt)) {
+        mysqli_stmt_close($stmt);
+        return "Tugas telah ditandai sebagai selesai";
+    } else {
+        mysqli_stmt_close($stmt);
+        return "Error: " . mysqli_error($koneksi);
+    }
 }
+
 ?>

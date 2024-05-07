@@ -7,16 +7,15 @@ if (!isset($_SESSION["login"])) {
 require 'koneksi.php';
 $error ='';
 
-// Inisialisasi array status selesai
-$completedTasks = [];
-
 // Memanggil jalankanQuery() dengan query SQL yang sesuai
 $user_id = $_SESSION["user_id"];
 $tasks = jalankanQuery("SELECT * FROM todo WHERE user_id = $user_id");
 
+// Proses jika tombol "Tambah" ditekan
 if (isset($_POST['tambah'])){
     if (!empty($_POST['todo'])){
         tambahTodo($_POST);
+        // Redirect kembali ke halaman todoList setelah menambah tugas
         header("Location: todoList.php");
         exit();
     } else {
@@ -26,23 +25,23 @@ if (isset($_POST['tambah'])){
     }
 }
 
+// Periksa setiap elemen $_POST untuk menangani tombol "Selesai" atau "Hapus"
 foreach ($_POST as $key => $value) {
-    if (strpos($key, 'hapus') !== false) {
-        $index = substr($key, strlen('hapus')); 
-        hapusData($_POST, $index); // Memanggil fungsi hapusData() untuk menghapus tugas
-    }
-}
-
-foreach ($_POST as $key => $value) {
-    if (strpos($key, 'selesai') !== false) {
-        $index = substr($key, strlen('selesai')); 
-        // Simpan informasi tentang todo mana yang selesai dicoret
-        $completedTasks[$index] = true; // Simpan indeks tugas yang selesai
+    if (strpos($key, 'selesai_') !== false) {
+        $index = substr($key, strlen('selesai_'));
         tandaiSelesai($_POST, $index);
+        // Setelah menandai selesai, perbarui daftar tugas
+        $tasks = jalankanQuery("SELECT * FROM todo WHERE user_id = $user_id");
+    } elseif (strpos($key, 'hapus_') !== false) {
+        $index = substr($key, strlen('hapus_'));
+        hapusData($_POST, $index);
+        // Setelah menghapus, perbarui daftar tugas
+        $tasks = jalankanQuery("SELECT * FROM todo WHERE user_id = $user_id");
     }
 }
 ?>
 
+<!-- HTML dan JavaScript -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,7 +53,6 @@ foreach ($_POST as $key => $value) {
         .coret {
             text-decoration: line-through;
         }
-
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -132,7 +130,7 @@ foreach ($_POST as $key => $value) {
 </head>
 <body>
     <header>
-        <h1>Michael Diva Berliano</h1>
+    <h1>Michael Diva Berliano</h1>
         <img src="logotugas.png" alt="Foto Profil">
         <h2>225314020</h2>
 
@@ -143,25 +141,30 @@ foreach ($_POST as $key => $value) {
     </header>
     <form action="" method="post">
         <div class="container">
+            <!-- Form untuk menambah tugas -->
             <div class="tambah-todo">
                 <input type="text" name="todo" placeholder="Teks todo">
                 <button class="tambah" name="tambah">Tambah</button>
             </div>
+            
+            <!-- Daftar tugas -->
             <?php foreach ($tasks as $index => $task):?>
                 <div class="show-todo">
-                    <!-- Tambahkan kelas 'coret' jika statusnya 'selesai' -->
-                    <input type="text" name="isi<?php echo $index;?>" value="<?php echo $task['todolist']; ?>" class="<?php echo $task['status'] === 'selesai' ? 'coret' : '';?>" >
-                    <!-- Tambahkan fungsi onClick untuk tombol "Selesai" -->
-                    <button class="tambah" name="selesai<?php echo $index;?>" onClick="toggleCoret(this)">Selesai</button>
-                    <button class="tambah" name="hapus<?php echo $index;?>">Hapus</button>
-                    <input type="hidden" name="index" value="<?php echo $index; ?>">
+                    <!-- Input field untuk tugas -->
+                    <input type="text" name="isi<?php echo $index;?>" value="<?php echo $task['todolist']; ?>" class="<?php echo $task['status'] === 'selesai' ? 'coret' : '';?>">
+                    
+                    <!-- Tombol "Selesai" -->
+                    <button class="tambah" name="selesai_<?php echo $index; ?>" onclick="toggleCoret(this)">Selesai</button>
+                    
+                    <!-- Tombol "Hapus" -->
+                    <button class="tambah" name="hapus_<?php echo $index; ?>">Hapus</button>
                 </div>
             <?php endforeach;?>
-
         </div>
     </form>
+
+    <!-- Script JavaScript -->
     <script>
-        // Fungsi untuk menambah atau menghilangkan kelas 'coret' saat tombol "Selesai" ditekan
         function toggleCoret(button) {
             var inputField = button.previousElementSibling; // Dapatkan input field sebelum tombol
             inputField.classList.toggle('coret'); // Tambah atau hilangkan kelas 'coret'
